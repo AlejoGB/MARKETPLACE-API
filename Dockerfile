@@ -5,7 +5,12 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /code
 
 COPY ./requirements.txt requirements.txt
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+    gcc libc-dev linux-headers postgresql-dev    
+RUN apk add --update --no-cache postgresql-client
+
 RUN pip install -r requirements.txt
+RUN apk del .tmp-build-deps 
 
 RUN mkdir /backend-api
 WORKDIR /backend-api
