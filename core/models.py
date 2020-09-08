@@ -25,16 +25,16 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     #user con mail en lugar de nombre de usuario
-    name= models.CharField(max_length=100, default=0)
-    email= models.CharField(max_length=150, unique=True)
-    phone= models.CharField(max_length=20, default=0)
-    is_active= models.BooleanField(default=True)
-    is_staff= models.BooleanField(default=False)
-    is_owner= models.BooleanField(default=False)
-    adress_1= models.CharField(max_length=200, default=0)
-    adress_2= models.CharField(max_length=200, default=0)
-    adress_3= models.CharField(max_length=200, default=0)
-    adress_4= models.CharField(max_length=200, default=0)
-    adress_5= models.CharField(max_length=200, default=0)   
+    name = models.CharField(max_length=100, default=0)
+    email = models.CharField(max_length=150, unique=True)
+    phone = models.CharField(max_length=20, default=0)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_owner = models.BooleanField(default=False)
+    adress_1 = models.CharField(max_length=200, default=0)
+    adress_2 = models.CharField(max_length=200, default=0)
+    adress_3 = models.CharField(max_length=200, default=0)
+    adress_4 = models.CharField(max_length=200, default=0)
+    adress_5 = models.CharField(max_length=200, default=0)   
     objects= UserManager()
     USERNAME_FIELD = 'email' 
