@@ -36,4 +36,4 @@ class User(AbstractBaseUser, PermissionsMixin):
     adress_4 = models.CharField(max_length=200, default=0)
     adress_5 = models.CharField(max_length=200, default=0)
     objects = UserManager()
-    USERNAME_FIELD = 'email' 
+    USERNAME_FIELD = 'email'
