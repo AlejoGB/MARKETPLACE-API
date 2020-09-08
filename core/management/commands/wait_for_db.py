@@ -15,7 +15,5 @@ class Command(BaseCommand):
             except OperationalError:
                 self.stdout.write('Db unavailable, waiting ...')
                 time.sleep(1)
-        
-        self.stdout.write(self.style.SUCCESS('Db available.'))
 
-            
+        self.stdout.write(self.style.SUCCESS('Db available.'))

@@ -4,11 +4,12 @@ from core import models
 
 # Register your models here.
 
+
 class UserAdmin(BaseUserAdmin):
     ordering = ['id']
-    list_display = ['email' , 'name']
-    fieldsets= (
-        (None , {'fields': ('email' , 'password')}),
+    list_display = ['email', 'name']
+    fieldsets = (
+        (None , {'fields': ('email', 'password')}),
         (('Personal Info'), {'fields': ('name',)}),
         (
             ('Permisions'),
@@ -22,5 +23,6 @@ class UserAdmin(BaseUserAdmin):
             'fields': ('email', 'password1', 'password2')
         }),
     )
-admin.site.register(models.User , UserAdmin)
 
+
+admin.site.register(models.User, UserAdmin)
