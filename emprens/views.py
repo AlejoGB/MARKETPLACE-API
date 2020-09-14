@@ -1,6 +1,6 @@
-from .serializers import EmprendimientoSerializer
+from .serializers import EmprendimientoSerializer, ProductoSerializer
 from rest_framework import generics
-from core.models import Emprendimiento
+from core.models import Emprendimiento, Producto
 # from django.shortcuts import render
 
 # Create your views here.
@@ -23,9 +23,10 @@ class EmprendimientoBarrioView(generics.ListAPIView):
         return Emprendimiento.objects.filter(barrio__iexact=barrio)
 
 
-class EmprendimientoCRUDView(generics.RetrieveAPIView): 
+class EmprendimientoCRUDView(generics.RetrieveAPIView):
     # por ahora solo RETRIEVE    # Detailview , CreateView , FormView
-    # una vez implementados los usuarios: CREATE UPDATE DELETE                        
+    # una vez implementados los usuarios: CREATE UPDATE DELETE
+    
     serializer_class = EmprendimientoSerializer
     lookup_field = 'pk'
 
@@ -34,4 +35,13 @@ class EmprendimientoCRUDView(generics.RetrieveAPIView):
 
     def get_serializer_context(self, *args, **kwargs):
         return {"request": self.request}
+
+
+class ProductoListView(generics.ListAPIView):
+    serializer_class = ProductoSerializer
+
+    def get_queryset(self):
+        emprendimiento = self.kwargs['pk']
+        productos = Producto.objects.filter(emprendimiento=emprendimiento)
+        return productos
 

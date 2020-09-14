@@ -139,3 +139,24 @@ def emprendimiento_pre_save_receiver(sender, instance, *args, **kwargs):
 
 
 pre_save.connect(emprendimiento_pre_save_receiver, sender=Emprendimiento)
+
+
+class ProductoManager(models.Manager):
+    def getByEmpren(self, id):  # Producto.objects.getbyEmpren()
+        return self.get_queryset().filter(emprendimiento=id)  # Emprendimiento.objects.get_queryset()
+
+
+class Producto(models.Model):
+
+    emprendimiento = models.ForeignKey('Emprendimiento', on_delete=models.CASCADE, null=True, related_name='producto')
+    name = models.CharField(max_length=120)
+    tag = models.CharField(max_length=30)
+    descripcion = models.CharField(max_length=500)
+    imagen = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+    banner = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+    precio = models.IntegerField(default=0)
+    inmediato = models.BooleanField(default=False)
+    stock = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "%s - By: %s" % (self.nombre, self.emprendimiento)

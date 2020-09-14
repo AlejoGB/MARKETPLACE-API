@@ -1,4 +1,4 @@
-from core.models import Emprendimiento
+from core.models import Emprendimiento, Producto
 from rest_framework import serializers
 
 
@@ -19,9 +19,27 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
             'direccion',
             'barrio',
             'ciudad',
-            'cobertura',         
+            'cobertura',
             'horario',
             'envio',
         ]
 
+        read_only_fields = ['pk']
+
+
+class ProductoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producto
+        fields = [
+            'emprendimiento',
+            'pk',
+            'name',
+            'tag',
+            'descripcion',
+            'imagen',
+            'precio',
+            'inmediato',
+            'stock'
+        ]
+        # depth = 1
         read_only_fields = ['pk']

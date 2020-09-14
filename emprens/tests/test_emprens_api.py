@@ -3,8 +3,8 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from core.models import Emprendimiento
-from emprens.serializers import EmprendimientoSerializer
+from core.models import Emprendimiento, Producto
+from emprens.serializers import EmprendimientoSerializer, ProductoSerializer
 
 
 EMPRENS_URL = reverse('emprens:empren-list')
@@ -13,6 +13,11 @@ EMPRENS_URL = reverse('emprens:empren-list')
 def barrio_url(barrio):
     """Return empren barrio list URL"""
     return reverse('emprens:barrio-list', args=[barrio])
+
+
+def productos_list(id):
+    '''Return empren detail URL'''
+    return reverse('emprens:empren-productos', args=[id])
 
 
 def empren_CRUD(id):
@@ -38,6 +43,19 @@ def sample_empren(owner, **params):
 
     defaults.update(params)
     return Emprendimiento.objects.create(owner=owner, **defaults)
+
+
+def sample_producto(emprendimiento, **params):
+    # crea un producto para pruebas
+    defaults = {
+        'name': 'Triple Bacon',
+        'tag': 'Hamburguesa',
+        'precio': 240.00,
+        'inmediato': True
+    }
+
+    defaults.update(params)
+    return Producto.objects.create(emprendimiento=emprendimiento, **defaults)
 
 
 class PublicEmprendimientoApiTest(TestCase):
@@ -112,4 +130,30 @@ class PublicEmprendimientoApiTest(TestCase):
 #             'Test#1234'
 #         )
 #         self.client.force_authenticate(self.user)
-    
+
+
+class PublicProductoApiTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'test@test.com',
+            'Test#1234'
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_retrieve_productos(self):
+        empren = sample_empren(owner=self.user, id=10)
+
+        sample_producto(emprendimiento=empren)  # capaz hay q poner un 10 aca
+        sample_producto(emprendimiento=empren, name='Fideos')
+
+        url = productos_list(10)
+        res = self.client.get(url)
+
+        productos = Producto.objects.filter(emprendimiento=10)
+        serializer = ProductoSerializer(productos, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(len(res.data), 2)
