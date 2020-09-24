@@ -19,7 +19,7 @@ def upload_image_path(instance, filename):  # genera un path para la imagen con 
     new_filename = random.randint(1, 154125125)
     name, ext = get_filename_ext(filename)
     final_filename = f'{new_filename}{ext}'
-    return f"emprens/{new_filename}/{final_filename}"
+    return f"static/emprens/{new_filename}/{final_filename}"
 
 
 class UserManager(BaseUserManager):
@@ -159,4 +159,4 @@ class Producto(models.Model):
     stock = models.BooleanField(default=True)
 
     def __str__(self):
-        return "%s - By: %s" % (self.nombre, self.emprendimiento)
+        return "%s - By: %s" % (self.name, self.emprendimiento)
