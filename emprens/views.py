@@ -1,6 +1,8 @@
 from .serializers import EmprendimientoSerializer, ProductoSerializer
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 from core.models import Emprendimiento, Producto
+from .permissions import IsOwnerOrReadOnly
+from rest_framework.response import Response
 # from django.shortcuts import render
 
 # Create your views here.
@@ -23,10 +25,9 @@ class EmprendimientoBarrioView(generics.ListAPIView):
         return Emprendimiento.objects.filter(barrio__iexact=barrio)
 
 
-class EmprendimientoCRUDView(generics.RetrieveAPIView):
-    # por ahora solo RETRIEVE    # Detailview , CreateView , FormView
-    # una vez implementados los usuarios: CREATE UPDATE DELETE
-    
+class EmprendimientoDetailView(generics.RetrieveAPIView):
+    permission_classes = (IsOwnerOrReadOnly, )
+    # Vista de detaille    
     serializer_class = EmprendimientoSerializer
     lookup_field = 'pk'
 
@@ -36,10 +37,22 @@ class EmprendimientoCRUDView(generics.RetrieveAPIView):
     def get_serializer_context(self, *args, **kwargs):
         return {"request": self.request}
 
+class EmprendimientoCreateView(generics.CreateAPIView):
+    # Create VIEW
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = EmprendimientoSerializer
+
+    def post(self, request):
+        serializer = EmprendimientoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ProductoListView(generics.ListAPIView):
     serializer_class = ProductoSerializer
-
+    permission_classes = (IsOwnerOrReadOnly, )
     def get_queryset(self):
         emprendimiento = self.kwargs['pk']
         productos = Producto.objects.filter(emprendimiento=emprendimiento)

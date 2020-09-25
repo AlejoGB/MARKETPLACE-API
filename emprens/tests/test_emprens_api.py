@@ -8,7 +8,7 @@ from emprens.serializers import EmprendimientoSerializer, ProductoSerializer
 
 
 EMPRENS_URL = reverse('emprens:empren-list')
-
+EMPREN_CREATE_URL = reverse('emprens:empren-create')
 
 def barrio_url(barrio):
     """Return empren barrio list URL"""
@@ -19,11 +19,9 @@ def productos_list(id):
     '''Return empren detail URL'''
     return reverse('emprens:empren-productos', args=[id])
 
-
-def empren_CRUD(id):
+def empren_detail(id):
     '''Return empren detail URL'''
-    return reverse('emprens:empren-crud', args=[id])
-
+    return reverse('emprens:empren-detail', args=[id])
 
 def sample_empren(owner, **params):
     
@@ -62,6 +60,7 @@ class PublicEmprendimientoApiTest(TestCase):
     # Test unauthenticated empren API access
 
     def setUp(self):
+        # For empren creation only
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             'test@test.com',
@@ -109,27 +108,84 @@ class PublicEmprendimientoApiTest(TestCase):
         sample_empren(owner=self.user)
         sample_empren(owner=self.user2, name='panadero', id=10)
 
-        url = empren_CRUD(10)
+        url = empren_detail(10)
         res = self.client.get(url)
         emprens = Emprendimiento.objects.getById(10)
         serializer = EmprendimientoSerializer(emprens)
-        print(serializer.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
         '''Por ahora llego hasta RETRIEVE
             faltan: los privados CREATE UPDATE
              RETRIEVE(PRIVATE) DELETE'''
 
-# class PrivateEmprendimientoApiTests(TestCase):
-#     # Test unauthenticated empren API access
+class PrivateEmprendimientoApiTests(TestCase):
+    # Test authenticated empren API access
 
-#     def setUp(self):
-#         self.client = APIClient()
-#         self.user = get_user_model().objects.create_user(
-#             'test@test.com',
-#             'Test#1234'
-#         )
-#         self.client.force_authenticate(self.user)
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'test@test.com',
+            'Test#1234'
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_create_emprendimiento(self):
+
+        payload = {
+            'name': 'Buenas Burgers',
+            'tag': 'Alimentos',
+            'subtag': 'Panaderia',
+            'cont_whatsapp': '+5411 1234-5678',
+            'direccion': 'Larazabal 1245',
+            'barrio': 'Devoto',
+            'ciudad': 'CABA',
+            'cobertura': 'Devoto, Villa Crespo, Saavedra',
+            'envio': '$60-$120',
+            'horario': '9 a 18',
+            #'owner': self.user.email
+        }
+        res = self.client.post(EMPREN_CREATE_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        empren = Emprendimiento.objects.get(id=res.data['pk'])
+        
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(empren, key))
+        
+        self.assertEqual(self.user, getattr(empren, 'owner'))
+
+    # def test_create_segundo_emprendimiento_fail(self):
+
+    #     payload = {
+    #         'name': 'Buenas Burgers',
+    #         'tag': 'Alimentos',
+    #         'subtag': 'Panaderia',
+    #         'cont_whatsapp': '+5411 1234-5678',
+    #         'direccion': 'Larazabal 1245',
+    #         'barrio': 'Devoto',
+    #         'ciudad': 'CABA',
+    #         'cobertura': 'Devoto, Villa Crespo, Saavedra',
+    #         'envio': '$60-$120',
+    #         'horario': '9 a 18'
+    #     }
+    #     res = self.client.post(EMPREN_CREATE_URL, payload)
+
+    #     payload2 = {
+    #         'name': 'Buenas Burgers2',
+    #         'tag': 'Alimentos',
+    #         'subtag': 'Panaderia',
+    #         'cont_whatsapp': '+5411 1234-5678',
+    #         'direccion': 'Larazabal 1245',
+    #         'barrio': 'Devoto',
+    #         'ciudad': 'CABA',
+    #         'cobertura': 'Devoto, Villa Crespo, Saavedra',
+    #         'envio': '$60-$120',
+    #         'horario': '9 a 18' 
+    #     }
+
+    #     res2 = self.client.post(EMPREN_CREATE_URL, payload)
+        
+    #     self.assertEqual(res2.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class PublicProductoApiTest(TestCase):

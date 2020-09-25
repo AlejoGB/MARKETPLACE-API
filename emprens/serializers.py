@@ -2,8 +2,11 @@ from core.models import Emprendimiento, Producto
 from rest_framework import serializers
 
 
-class EmprendimientoSerializer(serializers.ModelSerializer):
 
+
+
+class EmprendimientoSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
     class Meta:
         model = Emprendimiento
         fields = [
@@ -22,9 +25,15 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
             'cobertura',
             'horario',
             'envio',
+            'owner'
         ]
-
-        read_only_fields = ['pk']
+        #extra_kwargs = {
+        #    'owner': {'required': True}
+        #}
+        #read_only_fields = ['pk', 'owner']
+    
+    def create(self, validated_data):
+        return Emprendimiento.objects.create(**validated_data)
 
 
 class ProductoSerializer(serializers.ModelSerializer):

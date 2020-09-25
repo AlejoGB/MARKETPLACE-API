@@ -19,7 +19,7 @@ def upload_image_path(instance, filename):  # genera un path para la imagen con 
     new_filename = random.randint(1, 154125125)
     name, ext = get_filename_ext(filename)
     final_filename = f'{new_filename}{ext}'
-    return f"static/emprens/{new_filename}/{final_filename}"
+    return f"emprens/{new_filename}/{final_filename}"
 
 
 class UserManager(BaseUserManager):
@@ -103,11 +103,11 @@ class Emprendimiento(models.Model):
     slug = models.SlugField(blank=True, unique=True)
     tag = models.CharField(max_length=50)
     subtag = models.CharField(max_length=50)
-    descripcion = models.CharField(max_length=200)
+    descripcion = models.CharField(max_length=200, blank=True)
     logo = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
     # contacto
-    cont_mail = models.CharField(max_length=100)
-    cont_insta = models.CharField(max_length=100)
+    cont_mail = models.CharField(max_length=100, blank=True)
+    cont_insta = models.CharField(max_length=100, blank=True)
     cont_whatsapp = models.CharField(max_length=100)
     # ubicacion
     direccion = models.CharField(max_length=200)
@@ -117,10 +117,10 @@ class Emprendimiento(models.Model):
     cobertura = models.CharField(max_length=120)
     envio = models.CharField(max_length=80)
     horario = models.CharField(max_length=200)
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
     # private
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.DO_NOTHING, related_name = 'empren')
+    owner = models.ForeignKey('User', null=True, on_delete=models.DO_NOTHING, related_name = 'empren')
     featured = models.BooleanField(default=False)
 
     objects = EmprendimientoManager()
