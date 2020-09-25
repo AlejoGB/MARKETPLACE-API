@@ -44,9 +44,15 @@ class EmprendimientoCreateView(generics.CreateAPIView):
 
     def post(self, request):
         serializer = EmprendimientoSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(owner=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+        user_db = User.objects.get(email=user.email)
+        if user_db.is_owner == False:
+            if serializer.is_valid():
+                serializer.save(owner=request.user)
+                user_db.is_owner = True
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
