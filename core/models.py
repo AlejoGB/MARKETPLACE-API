@@ -49,6 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_owner = models.BooleanField(default=False)
+    barrio = models.CharField(max_length=100, blank=True)
     adress_1 = models.CharField(max_length=200, default=0)
     adress_2 = models.CharField(max_length=200, default=0)
     adress_3 = models.CharField(max_length=200, default=0)

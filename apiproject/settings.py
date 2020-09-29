@@ -26,7 +26,7 @@ SECRET_KEY = '4*_i0php9$x)61q%zy%os6d6!z%8t42z0=vg)bylt3_ydzp(vo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.xaca.delivery']
 
 
 # Application definition
@@ -154,7 +154,7 @@ STATICFILES_FINDERS = [
 ### Eventualmente va a haber q cambiar los defaults de autorización
 
 
-# REST_FRAMEWORK = {
+#REST_FRAMEWORK = {
 # 'DEFAULT_PERMISSION_CLASSES': [
 # 'rest_framework.permissions.IsAuthenticated',
 # ],
@@ -162,4 +162,7 @@ STATICFILES_FINDERS = [
 # 'rest_framework.authentication.SessionAuthentication',
 # 'rest_framework.authentication.TokenAuthentication', 
 # ],
+#    'DEFAULT_RENDERER_CLASSES': (
+#        'rest_framework.renderers.JSONRenderer',
+#    )
 # }

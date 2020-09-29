@@ -1,6 +1,6 @@
 from .serializers import EmprendimientoSerializer, ProductoSerializer
 from rest_framework import generics, permissions, status
-from core.models import Emprendimiento, Producto
+from core.models import Emprendimiento, Producto, User
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.response import Response
 # from django.shortcuts import render
@@ -37,6 +37,8 @@ class EmprendimientoDetailView(generics.RetrieveAPIView):
     def get_serializer_context(self, *args, **kwargs):
         return {"request": self.request}
 
+    
+
 class EmprendimientoCreateView(generics.CreateAPIView):
     # Create VIEW
     permission_classes = (permissions.IsAuthenticated, )
@@ -44,17 +46,18 @@ class EmprendimientoCreateView(generics.CreateAPIView):
 
     def post(self, request):
         serializer = EmprendimientoSerializer(data=request.data)
-
-
-        user_db = User.objects.get(email=user.email)
+        user_db = User.objects.get(email=request.user.email)
         if user_db.is_owner == False:
             if serializer.is_valid():
                 serializer.save(owner=request.user)
                 user_db.is_owner = True
-                
+                user_db.save()
+                print(user_db.is_owner)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        if serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(HTTP_400_BAD_REQUEST)
 
 class ProductoListView(generics.ListAPIView):
     serializer_class = ProductoSerializer
@@ -63,4 +66,8 @@ class ProductoListView(generics.ListAPIView):
         emprendimiento = self.kwargs['pk']
         productos = Producto.objects.filter(emprendimiento=emprendimiento)
         return productos
+
+
+# class ProductoCreateView(generics.CreateAPIView):
+
 

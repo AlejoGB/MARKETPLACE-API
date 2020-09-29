@@ -36,6 +36,7 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
         return Emprendimiento.objects.create(**validated_data)
 
 
+
 class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
