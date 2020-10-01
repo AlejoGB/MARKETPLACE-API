@@ -26,7 +26,7 @@ class EmprendimientoBarrioView(generics.ListAPIView):
 
 
 class EmprendimientoDetailView(generics.RetrieveAPIView):
-    permission_classes = (IsOwnerOrReadOnly, )
+    permission_classes = (permissions.IsAuthenticated, )
     # Vista de detaille    
     serializer_class = EmprendimientoSerializer
     lookup_field = 'pk'
@@ -47,12 +47,13 @@ class EmprendimientoCreateView(generics.CreateAPIView):
     def post(self, request):
         serializer = EmprendimientoSerializer(data=request.data)
         user_db = User.objects.get(email=request.user.email)
+        # un emprendimiento por usuario
         if user_db.is_owner == False:
             if serializer.is_valid():
                 serializer.save(owner=request.user)
                 user_db.is_owner = True
                 user_db.save()
-                print(user_db.is_owner)
+                
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         if serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -68,6 +69,28 @@ class ProductoListView(generics.ListAPIView):
         return productos
 
 
-# class ProductoCreateView(generics.CreateAPIView):
+class ProductoCreateView(generics.CreateAPIView):
+
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly, )
+    serializer_class = ProductoSerializer
+
+    def post(self, request, **kwargs):    
+        serializer = ProductoSerializer(data=request.data)
+        user_db = User.objects.get(email=request.user.email)
+        empren = Emprendimiento.objects.getByOwner(owner=user_db)
+        if empren is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        # un emprendimiento por usuario
+        if user_db.is_owner == True and int(self.kwargs['pk']) == int(empren.pk):
+            print('debug: valid auth and permision')
+            if serializer.is_valid():
+                serializer.save(emprendimiento=empren)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
+        else:
+            print(serializer.data)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

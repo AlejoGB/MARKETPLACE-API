@@ -19,6 +19,11 @@ def productos_list(id):
     '''Return empren detail URL'''
     return reverse('emprens:empren-productos', args=[id])
 
+
+def product_create(id):
+    '''Return product create URL'''
+    return reverse('emprens:producto-create', args=[id])
+
 def empren_detail(id):
     '''Return empren detail URL'''
     return reverse('emprens:empren-detail', args=[id])
@@ -27,7 +32,7 @@ def sample_empren(owner, **params):
     
     # crea un emprendimiento para pruebas
     defaults = {
-        'name': 'Buenas Burgers',
+        'name': 'Sample Name',
         'tag': 'Alimentos',
         'subtag': 'Panaderia',
         'cont_whatsapp': '+5411 1234-5678',
@@ -189,74 +194,115 @@ class PrivateEmprendimientoApiTests(TestCase):
         res = self.client.post(EMPREN_CREATE_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_update_emprendimiento(self):
-        # test updating emprendimiento for auth user
+    # def test_update_emprendimiento(self):
+    #     # test updating emprendimiento for auth user
 
-        sample_empren(owner=self.user, name='panadero', id=10)
+    #     sample_empren(owner=self.user, name='panadero', id=10)
+    #     self.user.is_owner = True
+    #     self.user.save()
+        
+    #     url = empren_detail(10)
+    #     payload = {'name': 'new name', 'tag': 'NewTag'}
+    #     res = self.client.patch(url, payload)
+        
+    #     empren_upd = Emprendimiento.objects.getById(10)
+
+
+    #     self.assertEqual(empren_upd.name, payload['name'])
+    #     self.assertEqual(empren_upd.tag, payload['tag'])
+    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        
+
+#    def test_update_emprendimiento_fail_not_owner(self)
+
+
+    # def test_delete_emprendimiento(self):
+    #     # test updating user profile for auth user
+    #     payload = {'name': 'new name', 'password': 'NewPassword#123'}
+
+    #     res = self.client.delete(UD_URL)
+
+    #     self.user.refresh_from_db()
+    #     self.assertEqual(self.user.name, payload['name'])
+    #     self.assertTrue(self.user.check_password(payload['password']))
+    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+#    def test_delete_emprendimiento_fail_not_owner(self):    
+
+
+
+class PublicProductoApiTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'test@test.com',
+            'Test#1234'
+        )
+        self.user2 = get_user_model().objects.create_user(
+            'test2@test2.com',
+            'Test#1234'
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_retrieve_productos(self):
+        empren = sample_empren(owner=self.user, id=10)
+
+        sample_producto(emprendimiento=empren)  # capaz hay q poner un 10 aca
+        sample_producto(emprendimiento=empren, name='Fideos')
+
+        url = productos_list(10)
+        res = self.client.get(url)
+
+        productos = Producto.objects.filter(emprendimiento=10)
+        serializer = ProductoSerializer(productos, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(len(res.data), 2)
+
+    def test_create_producto(self):
+        empren = sample_empren(owner=self.user, id=10)
         self.user.is_owner = True
         self.user.save()
+        payload = {
+        'name': 'Triple Bacon',
+        'tag': 'Hamburguesa',
+        'descripcion': 'asd asd asd',
+        'precio': 240.00,
+        'inmediato': True
+        }
         
-        url = empren_detail(10)
-        payload = {'name': 'new name', 'tag': 'NewTag'}
-        res = self.client.patch(url, payload)
+        url = product_create(10)
+        res = self.client.post(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         
-        empren_upd = Emprendimiento.objects.getById(10)
-
-
-        self.assertEqual(empren_upd.name, payload['name'])
-        self.assertEqual(empren_upd.tag, payload['tag'])
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-
+        producto = Producto.objects.get(id=res.data['pk'])
         
-
-    def test_update_emprendimiento_fail_not_owner(self)
-
-
-    def test_delete_emprendimiento(self):
-        # test updating user profile for auth user
-        payload = {'name': 'new name', 'password': 'NewPassword#123'}
-
-        res = self.client.delete(UD_URL)
-
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.name, payload['name'])
-        self.assertTrue(self.user.check_password(payload['password']))
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-
-    def test_delete_emprendimiento_fail_not_owner(self):    
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(producto, key))
+        self.assertEqual(empren, getattr(producto, 'emprendimiento'))
 
 
-
-# class PublicProductoApiTest(TestCase):
-
-#     def setUp(self):
-#         self.client = APIClient()
-#         self.user = get_user_model().objects.create_user(
-#             'test2@test.com',
-#             'Test#1234'
-#         )
-#         self.client.force_authenticate(self.user)
-
-#     def test_retrieve_productos(self):
-#         empren = sample_empren(owner=self.user, id=10)
-
-#         sample_producto(emprendimiento=empren)  # capaz hay q poner un 10 aca
-#         sample_producto(emprendimiento=empren, name='Fideos')
-
-#         url = productos_list(10)
-#         res = self.client.get(url)
-
-#         productos = Producto.objects.filter(emprendimiento=10)
-#         serializer = ProductoSerializer(productos, many=True)
-
-#         self.assertEqual(res.status_code, status.HTTP_200_OK)
-#         self.assertEqual(res.data, serializer.data)
-#         self.assertEqual(len(res.data), 2)
-
-    # def test_create_producto(self):
-
-    # def test_create_producto_fail_not_owner(self):
-
+    def test_create_producto_fail_not_owner(self):
+        empren = sample_empren(owner=self.user2, id=10)
+        self.user.is_owner = True
+        self.user.save()
+        payload = {
+        'name': 'Triple Bacon',
+        'tag': 'Hamburguesa',
+        'descripcion': 'asd asd asd',
+        'precio': 240.00,
+        'inmediato': True
+        }
+        
+        url = product_create(10)
+        res = self.client.post(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        
+        
     # def test_update_producto(self):
 
     # def test_update_producto_fail_not_owner(self):

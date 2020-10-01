@@ -82,6 +82,11 @@ class EmprendimientoManager(models.Manager):
     def all(self):
         return self.get_queryset().active()
 
+    def getByOwner(self, owner):
+        qs = self.get_queryset().filter(owner=owner)
+        if qs.count() == 1:
+            return qs.first()
+            
     def getById(self, id):
         qs = self.get_queryset().filter(id=id).active()  # Emprendimiento.objects.get_queryset()
         if qs.count() == 1:

@@ -38,10 +38,10 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
 
 
 class ProductoSerializer(serializers.ModelSerializer):
+    emprendimiento = serializers.ReadOnlyField(source='emprendimiento.name')
     class Meta:
         model = Producto
         fields = [
-            'emprendimiento',
             'pk',
             'name',
             'tag',
@@ -49,7 +49,11 @@ class ProductoSerializer(serializers.ModelSerializer):
             'imagen',
             'precio',
             'inmediato',
-            'stock'
+            'stock',
+            'emprendimiento'
         ]
         # depth = 1
         read_only_fields = ['pk']
+
+    def create(self, validated_data):
+        return Producto.objects.create(**validated_data)

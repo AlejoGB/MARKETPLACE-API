@@ -26,7 +26,7 @@ SECRET_KEY = '4*_i0php9$x)61q%zy%os6d6!z%8t42z0=vg)bylt3_ydzp(vo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.xaca.delivery']
+ALLOWED_HOSTS = ['api.xaca.delivery', 'localhost']
 
 
 # Application definition

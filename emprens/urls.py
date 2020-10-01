@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import EmprendimientoListView, EmprendimientoBarrioView, EmprendimientoDetailView, EmprendimientoCreateView, ProductoListView
+from .views import EmprendimientoListView, EmprendimientoBarrioView, EmprendimientoDetailView, EmprendimientoCreateView, ProductoListView, ProductoCreateView
 
 app_name = 'emprens'
 
@@ -9,6 +9,9 @@ urlpatterns = [
     path('detail/<pk>/', EmprendimientoDetailView.as_view(), name='empren-detail'),
     path('<pk>/productos', ProductoListView.as_view(), name='empren-productos'),
 
-    #API EMPRENDEDORES
-    path('create/', EmprendimientoCreateView.as_view(), name='empren-create')
+    #CRUD EMPRENDIMIENTOS
+    path('create/', EmprendimientoCreateView.as_view(), name='empren-create'),
+
+    #CRUD PRODUCTOS
+    path('<pk>/producto/create', ProductoCreateView.as_view(), name='producto-create')
 ]
