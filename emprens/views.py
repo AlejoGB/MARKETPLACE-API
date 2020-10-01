@@ -1,7 +1,7 @@
 from .serializers import EmprendimientoSerializer, ProductoSerializer
 from rest_framework import generics, permissions, status
 from core.models import Emprendimiento, Producto, User
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsParentOwnerOrReadOnly
 from rest_framework.response import Response
 # from django.shortcuts import render
 
@@ -58,7 +58,8 @@ class EmprendimientoCreateView(generics.CreateAPIView):
         if serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(HTTP_400_BAD_REQUEST)
+            print('aaa')
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductoListView(generics.ListAPIView):
     serializer_class = ProductoSerializer
@@ -71,7 +72,7 @@ class ProductoListView(generics.ListAPIView):
 
 class ProductoCreateView(generics.CreateAPIView):
 
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly, )
+    permission_classes = (permissions.IsAuthenticated, IsParentOwnerOrReadOnly, )
     serializer_class = ProductoSerializer
 
     def post(self, request, **kwargs):    
@@ -79,7 +80,7 @@ class ProductoCreateView(generics.CreateAPIView):
         user_db = User.objects.get(email=request.user.email)
         empren = Emprendimiento.objects.getByOwner(owner=user_db)
         if empren is None:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response('El usuario no posee emprendimientos asociados a su nombre', status=status.HTTP_403_FORBIDDEN)
         # un emprendimiento por usuario
         if user_db.is_owner == True and int(self.kwargs['pk']) == int(empren.pk):
             print('debug: valid auth and permision')
