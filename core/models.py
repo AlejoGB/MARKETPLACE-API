@@ -146,11 +146,35 @@ def emprendimiento_pre_save_receiver(sender, instance, *args, **kwargs):
 
 pre_save.connect(emprendimiento_pre_save_receiver, sender=Emprendimiento)
 
+class ProductoQuerySet(models.query.QuerySet):
+
+    def barrio(self, barrio):
+        return self.filter(barrio__iexact=barrio)
+
+    def tag(self, tag):
+        return self.filter(tag__iexact=tag)
+
+    def stock(self, stock):
+        return self.filter(stock=True)
+
+    def inmediato(self, inmediato):
+        return self.filter(inmediato=True)
+
+
 
 class ProductoManager(models.Manager):
+
+    def get_queryset(self):
+        return ProductoQuerySet(self.model, using=self._db)
+
     def getByEmpren(self, id):  # Producto.objects.getbyEmpren()
         return self.get_queryset().filter(emprendimiento=id)  # Emprendimiento.objects.get_queryset()
 
+    def getById(self, id):
+        qs = self.get_queryset().filter(id=id)  # Emprendimiento.objects.get_queryset()
+        if qs.count() == 1:
+            return qs.first()
+        return None
 
 class Producto(models.Model):
 
@@ -163,6 +187,8 @@ class Producto(models.Model):
     precio = models.IntegerField(default=0)
     inmediato = models.BooleanField(default=False)
     stock = models.BooleanField(default=True)
+
+    objects = ProductoManager()
 
     def __str__(self):
         return "%s - By: %s" % (self.name, self.emprendimiento)
