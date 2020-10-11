@@ -1,5 +1,5 @@
 from .serializers import EmprendimientoSerializer, ProductoSerializer
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, authentication
 from core.models import Emprendimiento, Producto, User
 from .permissions import IsOwnerOrReadOnly, IsParentOwnerOrReadOnly
 from rest_framework.response import Response
@@ -43,7 +43,8 @@ class EmprendimientoCreateView(generics.CreateAPIView):
     # Create VIEW
     permission_classes = (permissions.IsAuthenticated, )
     serializer_class = EmprendimientoSerializer
-    
+    authentication_classes = (authentication.TokenAuthentication,)
+
     def post(self, request):
         serializer = EmprendimientoSerializer(data=request.data)
         user_db = User.objects.get(email=request.user.email)
@@ -65,6 +66,7 @@ class EmprendimientoRUDView(generics.RetrieveUpdateDestroyAPIView):
     
     serializer_class = EmprendimientoSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly )
+    authentication_classes = (authentication.TokenAuthentication,)
     lookup_field = 'pk'
    
     def get_queryset(self):
@@ -101,6 +103,7 @@ class ProductoCreateView(generics.CreateAPIView):
 
     permission_classes = (permissions.IsAuthenticated, )
     serializer_class = ProductoSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
 
     def post(self, request, **kwargs):    
         serializer = ProductoSerializer(data=request.data)
@@ -124,6 +127,7 @@ class ProductoRUDView(generics.RetrieveUpdateDestroyAPIView):
     
     serializer_class = ProductoSerializer
     permission_classes = (permissions.IsAuthenticated, IsParentOwnerOrReadOnly )
+    authentication_classes = (authentication.TokenAuthentication,)
     lookup_field = 'pk'
 
     def get_queryset(self):
