@@ -14,6 +14,7 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
             'name',
             'tag',
             'subtag',
+            'slug',
             'descripcion',
             'logo',
             'cont_mail',
