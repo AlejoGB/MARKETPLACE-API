@@ -9,13 +9,20 @@ from rest_framework.response import Response
 
 
 class EmprendimientoListView(generics.ListAPIView):
-    lookup_field = 'pk'
+    lookup_field = 'slug'
     serializer_class = EmprendimientoSerializer
 
     def get_queryset(self):
         return Emprendimiento.objects.all().order_by('-id')
 
+class EmprendimientoOwnerView(generics.ListAPIView):
+    lookup_field = 'owner'
+    serializer_class = EmprendimientoSerializer
 
+    def get_queryset(self):
+        owner = self.kwargs['owner']
+        return Emprendimiento.objects.filter(owner__iexact=owner)
+        
 class EmprendimientoBarrioView(generics.ListAPIView):
     
     serializer_class = EmprendimientoSerializer
@@ -29,7 +36,7 @@ class EmprendimientoDetailView(generics.RetrieveAPIView):
     #permission_classes = (permissions.IsAuthenticated, )
     # Vista de detaille    
     serializer_class = EmprendimientoSerializer
-    lookup_field = 'pk'
+    lookup_field = 'slug'
 
     def get_queryset(self):
         return Emprendimiento.objects.all()
@@ -67,7 +74,7 @@ class EmprendimientoRUDView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EmprendimientoSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly )
     authentication_classes = (authentication.TokenAuthentication,)
-    lookup_field = 'pk'
+    lookup_field = 'slug'
    
     def get_queryset(self):
         return Emprendimiento.objects.all()
@@ -95,8 +102,8 @@ class ProductoListView(generics.ListAPIView):
     serializer_class = ProductoSerializer
     permission_classes = (IsOwnerOrReadOnly, )
     def get_queryset(self):
-        emprendimiento = self.kwargs['pk']
-        productos = Producto.objects.filter(emprendimiento=emprendimiento)
+        emprendimiento = Emprendimiento.objects.get(slug=self.kwargs['slug'])
+        productos = Producto.objects.filter(emprendimiento=emprendimiento.id)
         return productos
 
 class ProductoCreateView(generics.CreateAPIView):
@@ -112,7 +119,7 @@ class ProductoCreateView(generics.CreateAPIView):
         if empren is None:
             return Response('El usuario no posee emprendimientos asociados a su nombre', status=status.HTTP_403_FORBIDDEN)
         # un emprendimiento por usuario
-        if user_db.is_owner == True and int(self.kwargs['pk']) == int(empren.pk):
+        if user_db.is_owner == True and str(self.kwargs['slug']) == str(empren.slug):
             if serializer.is_valid():
                 serializer.save(emprendimiento=empren)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -128,7 +135,7 @@ class ProductoRUDView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductoSerializer
     permission_classes = (permissions.IsAuthenticated, IsParentOwnerOrReadOnly )
     authentication_classes = (authentication.TokenAuthentication,)
-    lookup_field = 'pk'
+    lookup_field = 'slug'
 
     def get_queryset(self):
         return Producto.objects.all()
