@@ -111,18 +111,20 @@ class Emprendimiento(models.Model):
     subtag = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=200, blank=True)
     logo = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+    bkg_color = models.CharField(max_length=50, blank=True)
     # contacto
     cont_mail = models.CharField(max_length=100, blank=True)
     cont_insta = models.CharField(max_length=100, blank=True)
-    cont_whatsapp = models.CharField(max_length=100)
+    cont_whatsapp = models.CharField(max_length=100, blank=True)
     # ubicacion
-    direccion = models.CharField(max_length=200)
-    barrio = models.CharField(max_length= 50)
-    ciudad = models.CharField(max_length = 100)
+    direccion = models.CharField(max_length=200, blank=True)
+    barrio = models.CharField(max_length= 50, blank=True)
+    ciudad = models.CharField(max_length = 100, blank=True)
     # entrega
-    cobertura = models.CharField(max_length=120)
-    envio = models.CharField(max_length=80)
-    horario = models.CharField(max_length=200)
+    cobertura = models.CharField(max_length=120, blank=True)
+    envio = models.CharField(max_length=80, blank=True)
+    horario = models.CharField(max_length=200, blank=True)
+    dias = models.CharField(max_length=300, blank=True)
     is_published = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
     # private

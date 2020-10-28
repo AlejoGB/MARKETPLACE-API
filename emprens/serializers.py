@@ -17,6 +17,7 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
             'slug',
             'descripcion',
             'logo',
+            'bkg_color',
             'cont_mail',
             'cont_insta',
             'cont_whatsapp',
@@ -24,6 +25,7 @@ class EmprendimientoSerializer(serializers.ModelSerializer):
             'barrio',
             'ciudad',
             'cobertura',
+            'dias',
             'horario',
             'envio',
             'owner'
