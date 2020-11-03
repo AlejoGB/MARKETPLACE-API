@@ -15,5 +15,5 @@ urlpatterns = [
 
     #CRUD PRODUCTOS
     path('<slug>/producto/create/', ProductoCreateView.as_view(), name='producto-create'),
-    path('producto/rud/<slug>/', ProductoRUDView.as_view(), name='producto-rud'),
+    path('producto/rud/<pk>/', ProductoRUDView.as_view(), name='producto-rud'),
 ]

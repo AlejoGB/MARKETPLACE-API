@@ -135,7 +135,7 @@ class ProductoRUDView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductoSerializer
     permission_classes = (permissions.IsAuthenticated, IsParentOwnerOrReadOnly )
     authentication_classes = (authentication.TokenAuthentication,)
-    lookup_field = 'slug'
+    lookup_field = 'pk'
 
     def get_queryset(self):
         return Producto.objects.all()
